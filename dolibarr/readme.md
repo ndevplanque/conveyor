@@ -1,6 +1,6 @@
 # Dolibarr
 
-## Prérequis
+## Solution rapide avec Docker
 
 Compléter le dossier `conveyor/dolibarr` en y plaçant les fichiers suivants :
 
@@ -9,6 +9,14 @@ Compléter le dossier `conveyor/dolibarr` en y plaçant les fichiers suivants :
   - `.env`
   - `conf.php`
   - `db_backup.sql`
+
+Lancer Docker Desktop
+Exécuter `sh launch.sh`
+Aller sur `localhost:8080/dolibarr`
+
+Tout devrait fonctionner, avec les produits, les entrepôts et tout de configuré !
+
+# Solution de secours si cela ne fonctionne pas
 
 ## Installation
 
@@ -32,11 +40,17 @@ Tout d'abord, il faut activer les modules suivants :
 - API / Web services
 - Stock
 
-## Ajouts initiaux
+## DOLAPIKEY
+
+Générer une clé d'API pour l'utilisateur admin, car cela est nécessaire pour les requêtes API.
+
+Le header à ajouter est `{'DOLAPIKEY' : <Clé générée>}`.
+
+##  Ajouts initiaux
 
 ### Entrepôts
 
-Ajouter trois entrepôts :
+Ajouter trois entrepôts en faisant des requêtes `POST localhost:8080/dolibarr/api/index.php/warehouses` :
 
 - Le A :
 
@@ -81,6 +95,8 @@ Ajouter trois entrepôts :
 ```
 
 ### Produits
+
+Ajouter trois produits en faisant des requêtes `POST localhost:8080/dolibarr/api/index.php/products` :
 
 - Le cube vert :
 
