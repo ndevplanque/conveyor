@@ -9,10 +9,13 @@
     - `conf.php`
     - `db_backup.sql`
 - Lancer Docker Desktop
-- Exécuter `sh launch.sh`
+- Exécuter `sh launch.sh` (ça lance `docker compose up`)
+- Attendre que le serveur soit prêt (ça peut prendre 5 bonnes minutes)
 - Aller sur `localhost:8080/dolibarr`
 
 Tout devrait fonctionner, avec les produits, les entrepôts et tout de configuré !
+
+Il ne reste plus qu'à générer une clé d'API pour l'utilisateur admin afin de pouvoir faire des requêtes API.
 
 # Solution de secours si cela ne fonctionne pas
 
