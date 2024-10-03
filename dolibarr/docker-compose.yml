@@ -1,0 +1,52 @@
+services:
+  db:
+    image: mariadb:latest
+    container_name: dolibarr-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "8081:3307"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./my.cnf:/etc/mysql/my.cnf
+      - ./db_backup.sql:/docker-entrypoint-initdb.d/db_backup.sql
+    networks:
+      - dolibarr-network
+
+  web:
+    image: debian:latest
+    container_name: dolibarr-web
+    depends_on:
+      - db
+    ports:
+      - "8080:80"
+    volumes:
+      - ./dolibarr:/var/www/html
+      - ./documents:/var/lib/dolibarr/documents
+      - ./htdocs:/usr/share/dolibarr/htdocs
+      - ./conf.php:/etc/dolibarr/conf.php
+      - ./dolibarr_20.0.0-4_all.deb:/tmp/dolibarr.deb
+    environment:
+      DEBIAN_FRONTEND: noninteractive
+    entrypoint: >
+      /bin/bash -c "
+      apt-get update && apt-get install -y \
+      apache2 php php-mysql php-intl php-imap mariadb-client wget dpkg && \
+      dpkg -i /tmp/dolibarr.deb || apt-get install -f -y && \
+      service apache2 start && \
+      while ! mysql -h dolibarr-db -P3307 -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e 'SELECT 1;' > /dev/null 2>&1; do \
+        echo 'Waiting for database...'; sleep 2; \
+      done && \
+      tail -f /var/log/apache2/access.log
+      "
+    networks:
+      - dolibarr-network
+
+volumes:
+  db_data:
+
+networks:
+  dolibarr-network:
