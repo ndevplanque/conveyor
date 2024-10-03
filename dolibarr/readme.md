@@ -2,8 +2,15 @@
 
 ## Installation
 
+Sur Discord, télécharger les fichiers et les mettre dans le dossier `conveyor/dolibarr`
+- `.env`
+- `conf.php`
+- `db_backup.sql`
+- `dolibarr_20.0.0-4_all.deb`
+
+Puis :
 - Lancer Docker Desktop
-- Exécuter `sh launch.sh` (avec `[...] up --detach --build`)
+- Exécuter `sh launch.sh`
 - Aller sur `localhost:8080/dolibarr/install`
 - Suivre les étapes d'installation
 - Pour configurer le lien à la base de données, utiliser les informations suivantes:
