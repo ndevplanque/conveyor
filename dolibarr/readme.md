@@ -2,17 +2,15 @@
 
 ## Solution rapide avec Docker
 
-Compléter le dossier `conveyor/dolibarr` en y plaçant les fichiers suivants :
-
-- le code source de Dolibarr pour Debian : [dolibarr.deb](https://sourceforge.net/projects/dolibarr/files/Dolibarr%20installer%20for%20Debian-Ubuntu%20%28DoliDeb%29/20.0.0/dolibarr_20.0.0-4_all.deb/download)
-- les fichiers suivants (trouvables sur Discord) :
-  - `.env`
-  - `conf.php`
-  - `db_backup.sql`
-
-Lancer Docker Desktop
-Exécuter `sh launch.sh`
-Aller sur `localhost:8080/dolibarr`
+- Compléter le dossier `conveyor/dolibarr` en y plaçant les fichiers suivants :
+  - le code source de Dolibarr pour Debian : [dolibarr.deb](https://sourceforge.net/projects/dolibarr/files/Dolibarr%20installer%20for%20Debian-Ubuntu%20%28DoliDeb%29/20.0.0/dolibarr_20.0.0-4_all.deb/download)
+  - les fichiers suivants (trouvables sur Discord) :
+    - `.env`
+    - `conf.php`
+    - `db_backup.sql`
+- Lancer Docker Desktop
+- Exécuter `sh launch.sh`
+- Aller sur `localhost:8080/dolibarr`
 
 Tout devrait fonctionner, avec les produits, les entrepôts et tout de configuré !
 
