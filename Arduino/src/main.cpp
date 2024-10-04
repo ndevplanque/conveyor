@@ -1,8 +1,12 @@
 #include <Arduino.h>
 #include "DolibarrFacade.h"
 #include "Logger.h"
+#include "StepperMotor.h"
+#include "ServoMotor.h"
 
 Logger *logs;
+StepperMotor *stepper;
+ServoMotor *servo;
 
 DolibarrFacade *dolibarr;
 String dolip = "http://172.20.10.8:8080";
