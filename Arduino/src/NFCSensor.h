@@ -2,7 +2,8 @@
 #define NFC_SENSOR_H
 
 // TODO: Implement class
-class NFCSensor {
+class NFCSensor
+{
 public:
     NFCSensor();
     void updateState();

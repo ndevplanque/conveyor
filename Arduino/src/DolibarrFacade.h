@@ -11,14 +11,14 @@
 class DolibarrFacade
 {
 public:
-    DolibarrFacade(String dolapiurl, String dolapikey, Logger *logs);
+    DolibarrFacade(Logger *logs, String dolapiurl, String dolapikey);
     ErrorCode addStockMovementByRef(String productRef, int qty);
     ErrorCode getProductDataByRef(String productRef, JsonDocument &doc);
 
 private:
+    Logger* logs;
     String dolapiurl;
     String dolapikey;
-    Logger *logs;
     HTTPClient *dolibarr(String endpoint);
 };
 

@@ -1,10 +1,10 @@
 #include "NFCSensor.h"
 
 // TODO: Implement
-NFCSensor::NFCSensor() {
-
+NFCSensor::NFCSensor()
+{
 }
 
-void NFCSensor::updateState() {
-
+void NFCSensor::updateState()
+{
 }

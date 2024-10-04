@@ -1,7 +1,7 @@
 #include "DolibarrFacade.h"
 
-DolibarrFacade::DolibarrFacade(String dolapiurl, String dolapikey, Logger *logs)
-    : dolapiurl(dolapiurl), dolapikey(dolapikey), logs(logs)
+DolibarrFacade::DolibarrFacade(Logger *logs, String dolapiurl, String dolapikey)
+    : logs(logs), dolapiurl(dolapiurl), dolapikey(dolapikey)
 {
 }
 
