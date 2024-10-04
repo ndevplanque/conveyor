@@ -1,37 +1,37 @@
 #include <Arduino.h>
 #include "DolibarrFacade.h"
+#include "Logger.h"
 
-const char* ssid = "Delplanque";
-const char* password = "nicolebg67$$1234++";
+Logger *logs;
 
 DolibarrFacade *dolibarr;
 String dolip = "http://172.20.10.8:8080";
 String dolapipath = "/dolibarr/api/index.php";
-String dolapikey = "4eS9aC4829OLrfY3yRsXtaIHg6zK6Kz0";
+String dolapikey = "2PW5SR80mSsohf0cRXn1nR1TsmV0X44j";
 
-void setup() {
+const char *ssid = "Delplanque";
+const char *password = "nicolebg67$$1234++";
+
+void setup()
+{
     Serial.begin(115200);
 
-    dolibarr = new DolibarrFacade(dolip + dolapipath, dolapikey);
+    logs = new Logger();
+    dolibarr = new DolibarrFacade(dolip + dolapipath, dolapikey, logs);
 
     WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED) {
+    while (WiFi.status() != WL_CONNECTED)
+    {
         delay(1000);
-        Serial.println("Connexion au Wi-Fi...");
+        logs->print("Connexion au Wi-Fi...");
     }
-    Serial.println("Connecté au Wi-Fi !");
+    logs->print("Connecté au Wi-Fi !");
 }
 
-void loop() {
-    ErrorCode result = dolibarr->addStockMovementByRef("VERT", 1);
+void loop()
+{
+    ErrorCode error = dolibarr->addStockMovementByRef("VERT", 1);
+    logs->print("addStockMovementByRef", error);
 
-    // Vérifier le résultat de l'opération
-    if (result == SUCCESS) {
-        Serial.println("Mouvement de stock ajouté avec succès !");
-    } else {
-        Serial.print("Erreur lors de l'ajout du mouvement de stock. Code erreur: ");
-        Serial.println(result);
-    }
-
-    delay(10000);  // Pause avant la prochaine requête
+    delay(10000);
 }
