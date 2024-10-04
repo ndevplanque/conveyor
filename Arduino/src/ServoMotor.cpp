@@ -1,6 +1,7 @@
 #include "ServoMotor.h"
 
-ServoMotor::ServoMotor(Logger *logs, int pin) : logs(logs), servoPin(pin), currentAngle(0) {}
+ServoMotor::ServoMotor(Logger *logs, int pin)
+    : logs(logs), servoPin(pin), currentAngle(0) {}
 
 void ServoMotor::attach()
 {
