@@ -1,25 +1,16 @@
 #include "StepperMotor.h"
 
-StepperMotor::StepperMotor(Logger *logs, int stepsPerRevolution, int pin1, int pin2, int pin3, int pin4)
-    : logs(logs), stepper(stepsPerRevolution, pin1, pin2, pin3, pin4),
-      stepsPerRevolution(stepsPerRevolution),
-      pin1(pin1), pin2(pin2), pin3(pin3), pin4(pin4)
+// Constructor to initialize with the I2C address
+StepperMotor::StepperMotor(uint8_t i2cAddress) : _grbl(i2cAddress), _i2cAddress(i2cAddress)
 {
+    M5.begin();
+    M5.Power.begin();
+    _grbl.Init(&Wire);
+    _grbl.setMode("absolute");
 }
 
-void StepperMotor::attach()
+// Control the motor based on button inputs
+void StepperMotor::turn(int x)
 {
-    logs->print("Stepper motor attached.");
-}
-
-void StepperMotor::moveSteps(int steps)
-{
-    stepper.step(steps);
-    logs->print("Stepper motor moved " + String(steps) + " steps.");
-}
-
-void StepperMotor::setSpeed(int speedRPM)
-{
-    stepper.setSpeed(speedRPM);
-    logs->print("Stepper motor speed set to " + String(speedRPM) + " RPM.");
+    _grbl.setMotor(x);
 }

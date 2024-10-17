@@ -1,7 +1,7 @@
 #include "ServoMotor.h"
 
-ServoMotor::ServoMotor(Logger *logs, int pin)
-    : logs(logs), servoPin(pin), currentAngle(0) {}
+ServoMotor::ServoMotor(Logger *logger, int pin)
+    : logger(logger), servoPin(pin), currentAngle(0) {}
 
 void ServoMotor::attach()
 {
@@ -14,11 +14,11 @@ void ServoMotor::moveToAngle(int angle)
     {
         myServo.write(angle);
         currentAngle = angle;
-        logs->print("Servo moved to angle: " + String(angle));
+        logger->print("Servo moved to angle: " + String(angle));
     }
     else
     {
-        logs->print("Invalid angle: " + String(angle));
+        logger->print("Invalid angle: " + String(angle));
     }
 }
 

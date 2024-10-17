@@ -1,10 +1,11 @@
 #include <Arduino.h>
+#include <M5Stack.h>
 #include "DolibarrFacade.h"
 #include "Logger.h"
 #include "StepperMotor.h"
 #include "ServoMotor.h"
 
-Logger *logs;
+Logger *logger;
 StepperMotor *stepper;
 ServoMotor *servo;
 
@@ -18,24 +19,36 @@ const char *password = "nicolebg67$$1234++";
 
 void setup()
 {
-    Serial.begin(115200);
+    M5.begin();
+    M5.Power.begin();
 
-    logs = new Logger();
-    dolibarr = new DolibarrFacade(dolip + dolapipath, dolapikey, logs);
+    logger = new Logger();
+    
+    stepper = new StepperMotor();
+
+    logger->print("Test du stepper...");
+    stepper->turn(5);
+    stepper->turn(0);
+    logger->print("Le stepper bouge-t-il ?");
+
+    dolibarr = new DolibarrFacade(logger, dolip + dolapipath, dolapikey);
 
     WiFi.begin(ssid, password);
     while (WiFi.status() != WL_CONNECTED)
     {
-        delay(1000);
-        logs->print("Connexion au Wi-Fi...");
+        delay(5000);
+        logger->print("Connexion au Wi-Fi...");
     }
-    logs->print("Connecté au Wi-Fi !");
+    logger->print("Connecté au Wi-Fi !");
 }
 
 void loop()
 {
     ErrorCode error = dolibarr->addStockMovementByRef("VERT", 1);
-    logs->print("addStockMovementByRef", error);
+    logger->print("addStockMovementByRef", error);
+
+    stepper->turn(5);
+    stepper->turn(0);
 
     delay(10000);
 }

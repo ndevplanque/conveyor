@@ -1,7 +1,7 @@
 #include "DolibarrFacade.h"
 
-DolibarrFacade::DolibarrFacade(Logger *logs, String dolapiurl, String dolapikey)
-    : logs(logs), dolapiurl(dolapiurl), dolapikey(dolapikey)
+DolibarrFacade::DolibarrFacade(Logger *logger, String dolapiurl, String dolapikey)
+    : logger(logger), dolapiurl(dolapiurl), dolapikey(dolapikey)
 {
 }
 
@@ -28,7 +28,7 @@ ErrorCode DolibarrFacade::addStockMovementByRef(String productRef, int qty)
 
     JsonDocument productData;
     ErrorCode error = getProductDataByRef(productRef, productData);
-    // logs->print("getProductDataByRef", error);
+    // logger->print("getProductDataByRef", error);
     if (error != SUCCESS)
     {
         return error;
@@ -36,13 +36,13 @@ ErrorCode DolibarrFacade::addStockMovementByRef(String productRef, int qty)
 
     int productId = productData[0]["id"];
     int warehouseId = productData[0]["fk_default_warehouse"];
-    // logs->print("productId : " + String(productId) + " / warehouseId : " + String(warehouseId));
+    // logger->print("productId : " + String(productId) + " / warehouseId : " + String(warehouseId));
 
     String endpoint = "/stockmovements";
     String payload = "{\"product_id\":" + String(productId) + ",\"warehouse_id\":" + String(warehouseId) + ",\"qty\":" + String(qty) + "}";
     HTTPClient *http = dolibarr(endpoint);
     int httpCode = http->POST(payload);
-    logs->print(String(httpCode) + " POST " + endpoint);
+    logger->print(String(httpCode) + " POST " + endpoint);
 
     http->end();
     delete http;
@@ -65,7 +65,7 @@ ErrorCode DolibarrFacade::getProductDataByRef(String productRef, JsonDocument &d
     String endpoint = "/products?sqlfilters=t.ref:=:'" + productRef + "'&properties=id,fk_default_warehouse";
     HTTPClient *http = dolibarr(endpoint);
     int httpCode = http->GET();
-    logs->print(String(httpCode) + " GET " + endpoint);
+    logger->print(String(httpCode) + " GET " + endpoint);
 
     if (httpCode < 200 || httpCode >= 300)
     {

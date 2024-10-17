@@ -2,23 +2,20 @@
 #define STEPPER_MOTOR_H
 
 #include <Arduino.h>
-#include <Stepper.h>
+#include <M5Stack.h>
+#include <Module_GRBL_13.2.h>
 #include "Logger.h"
 
 class StepperMotor
 {
 public:
-    StepperMotor(Logger *logs, int stepsPerRevolution, int pin1, int pin2, int pin3, int pin4);
-
-    void attach();
-    void moveSteps(int steps);
-    void setSpeed(int speedRPM);
+    StepperMotor(uint8_t i2cAddress = 0x70);
+    void init();
+    void turn(int x = 0);
 
 private:
-    Stepper stepper;
-    Logger *logs;
-    int stepsPerRevolution;
-    int pin1, pin2, pin3, pin4;
+    Module_GRBL _grbl;
+    uint8_t _i2cAddress;
 };
 
 #endif

@@ -8,7 +8,7 @@
 class ServoMotor
 {
 public:
-    ServoMotor(Logger *logs, int pin);
+    ServoMotor(Logger *logger, int pin);
 
     void attach();
     void moveToAngle(int angle);
@@ -18,7 +18,7 @@ public:
 
 private:
     Servo myServo;
-    Logger *logs;
+    Logger *logger;
     int servoPin;
     int currentAngle;
 };
