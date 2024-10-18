@@ -9,11 +9,11 @@
 class StepperMotor
 {
 public:
-    StepperMotor(uint8_t i2cAddress = 0x70);
-    void init();
-    void turn(int angle = 0, int speed=300);
+    StepperMotor(Logger *logger, uint8_t i2cAddress = 0x70);
+    void move(int angle = 0, int speed = 300);
 
 private:
+    Logger *logger;
     Module_GRBL _grbl;
     uint8_t _i2cAddress;
 };

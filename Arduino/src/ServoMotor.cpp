@@ -1,33 +1,27 @@
 #include "ServoMotor.h"
 
-ServoMotor::ServoMotor(Logger *logger, int pin)
-    : logger(logger), servoPin(pin), currentAngle(0) {}
-
-void ServoMotor::attach()
+// Constructeur par défaut
+ServoMotor::ServoMotor(Logger *logger)
+    : logger(logger)
 {
-    myServo.attach(servoPin);
+    goPlus.begin();
 }
 
-void ServoMotor::moveToAngle(int angle)
+// Faire bouger le servomoteur à un angle spécifique
+void ServoMotor::move(int angle)
 {
-    if (angle >= 0 && angle <= 180)
+    // Limiter l'angle entre 0 et 180 degrés pour le servomoteur
+    if (angle < 0)
     {
-        myServo.write(angle);
-        currentAngle = angle;
-        logger->print("Servo moved to angle: " + String(angle));
+        angle = 0;
     }
-    else
+    else if (angle > 180)
     {
-        logger->print("Invalid angle: " + String(angle));
+        angle = 180;
     }
-}
-
-void ServoMotor::detach()
-{
-    myServo.detach();
-}
-
-int ServoMotor::getCurrentAngle()
-{
-    return currentAngle;
+    goPlus.Servo_write_angle(SERVO_NUM0, uint8_t(angle));
+    goPlus.Servo_write_angle(SERVO_NUM1, uint8_t(angle));
+    goPlus.Servo_write_angle(SERVO_NUM2, uint8_t(angle));
+    goPlus.Servo_write_angle(SERVO_NUM3, uint8_t(angle));
+    logger->print("Servo " + String(angle));
 }

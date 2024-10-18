@@ -24,13 +24,8 @@ void setup()
 
     logger = new Logger();
 
-    stepper = new StepperMotor();
-
-    logger->print("Test du stepper...");
-    stepper->turn(5);
-    stepper->turn(0);
-    logger->print("Le stepper bouge-t-il ?");
-
+    stepper = new StepperMotor(logger);
+    servo = new ServoMotor(logger);
     dolibarr = new DolibarrFacade(logger, dolip + dolapipath, dolapikey);
 
     WiFi.begin(ssid, password);
@@ -44,11 +39,18 @@ void setup()
 
 void loop()
 {
+    stepper->move(15);
+    servo->move(180);
+
+    delay(5000);
+
+    stepper->move(0);
+    servo->move(0);
+
+    delay(5000);
+
     ErrorCode error = dolibarr->addStockMovementByRef("VERT", 1);
     logger->print("addStockMovementByRef", error);
 
-    stepper->turn(5);
-    stepper->turn(0);
-
-    delay(10000);
+    delay(5000);
 }
