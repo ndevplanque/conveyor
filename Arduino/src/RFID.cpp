@@ -47,11 +47,11 @@ String RFID::readProductRef()
 
     return process(scanned);
 }
-s
-    String
-    RFID::nothingWasRead()
+
+String RFID::nothingWasRead()
 {
     screen->print("No RFID read");
+    lastRfidScan = "";
     return "";
 }
 
@@ -61,7 +61,7 @@ String RFID::process(String scanned)
     if (scanned != lastRfidScan)
     {
         lastRfidScan = scanned;
-        return scanned
+        return scanned;
     }
     // screen->print("Skipping RFID because already read");
     return "";

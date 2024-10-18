@@ -64,7 +64,7 @@ void processConveyor()
         stepper->move(1);
 
         String ref = rfid->readProductRef();
-
+        
         if (ref != "")
         {
             ErrorCode error = dolibarr->addStockMovementByRef(ref, 1);
