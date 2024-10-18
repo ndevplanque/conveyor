@@ -2,19 +2,22 @@
 #define RFID_H
 
 #include <M5Stack.h>
-#include "Logger.h"
+#include "Screen.h"
 #include "MFRC522_I2C.h"
 
 class RFID
 {
 public:
-    RFID(Logger *logger, byte chipAddress = 0x28);
+    RFID(Screen *screen, byte chipAddress = 0x28);
     String readHex();
     String readProductRef();
 
 private:
-    Logger *logger;
+    Screen *screen;
     MFRC522 mfrc522;
+    String lastRfidScan = "";
+    String nothingWasRead();
+    String process(String scanned);
 };
 
 #endif
