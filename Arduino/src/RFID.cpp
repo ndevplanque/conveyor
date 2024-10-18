@@ -1,6 +1,5 @@
 #include "RFID.h"
 
-// Constructeur par défaut
 RFID::RFID(Logger *logger, byte chipAddress)
     : logger(logger), mfrc522(chipAddress)
 {
@@ -14,6 +13,7 @@ String RFID::readHex()
 {
     if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial())
     {
+        logger->print("No RFID read");
         return "";
     }
 
@@ -41,6 +41,7 @@ String RFID::readProductRef()
 {
     if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial())
     {
+        logger->print("No RFID read");
         return "";
     }
 
