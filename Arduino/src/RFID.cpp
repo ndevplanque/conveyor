@@ -36,3 +36,15 @@ String RFID::readHex()
 
     return hexStr;
 }
+
+String RFID::readProductRef()
+{
+    if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial())
+    {
+        return "";
+    }
+
+    // TODO: implement this when you find a cube with rfid
+
+    return "VERT";
+}

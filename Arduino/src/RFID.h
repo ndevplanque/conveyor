@@ -10,6 +10,7 @@ class RFID
 public:
     RFID(Logger *logger, byte chipAddress = 0x28);
     String readHex();
+    String readProductRef();
 
 private:
     Logger *logger;
