@@ -1,26 +1,20 @@
 #ifndef SERVO_MOTOR_H
 #define SERVO_MOTOR_H
 
+#include <M5Stack.h>
 #include <Arduino.h>
-#include <ESP32Servo.h>
+#include "GoPlus2.h"
 #include "Logger.h"
 
 class ServoMotor
 {
 public:
-    ServoMotor(Logger *logger, int pin);
-
-    void attach();
-    void moveToAngle(int angle);
-    void detach();
-
-    int getCurrentAngle();
+    ServoMotor(Logger *logger);
+    void move(int angle = 0); // Faire bouger le servomoteur à un angle spécifique (0-180)
 
 private:
-    Servo myServo;
     Logger *logger;
-    int servoPin;
-    int currentAngle;
+    GoPlus2 goPlus;
 };
 
 #endif
