@@ -23,7 +23,7 @@ void setup()
     M5.Power.begin();
 
     logger = new Logger();
-    
+
     stepper = new StepperMotor();
 
     logger->print("Test du stepper...");

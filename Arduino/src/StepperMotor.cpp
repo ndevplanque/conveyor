@@ -10,7 +10,7 @@ StepperMotor::StepperMotor(uint8_t i2cAddress) : _grbl(i2cAddress), _i2cAddress(
 }
 
 // Control the motor based on button inputs
-void StepperMotor::turn(int x)
+void StepperMotor::turn(int angle, int speed)
 {
-    _grbl.setMotor(x);
+    _grbl.setMotor(angle, angle, angle, speed);
 }

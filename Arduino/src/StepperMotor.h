@@ -11,7 +11,7 @@ class StepperMotor
 public:
     StepperMotor(uint8_t i2cAddress = 0x70);
     void init();
-    void turn(int x = 0);
+    void turn(int angle = 0, int speed=300);
 
 private:
     Module_GRBL _grbl;
