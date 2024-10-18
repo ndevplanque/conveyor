@@ -16,7 +16,7 @@ void StateManager::setConveyorMode(ConveyorMode mode)
 {
     conveyorMode = mode;
     screen->drawButtons(conveyorMode);
-    screen->print("Conveyor mode set to " + translateConveyorMode(conveyorMode));
+    screen->print("Activation du mode " + translateConveyorMode(conveyorMode));
 }
 
 void StateManager::readButtons()

@@ -44,6 +44,7 @@ void setup()
         screen->print("Connexion au WiFi " + String(ssid) + "...");
     }
     screen->print("Connecte au WiFi !");
+    screen->print("Utilisez les boutons pour choisir un mode.");
 }
 
 void processConveyor()
