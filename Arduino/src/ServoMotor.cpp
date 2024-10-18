@@ -1,8 +1,8 @@
 #include "ServoMotor.h"
 
 // Constructeur par défaut
-ServoMotor::ServoMotor(Logger *logger)
-    : logger(logger)
+ServoMotor::ServoMotor(Screen *screen)
+    : screen(screen)
 {
     goPlus.begin();
 }
@@ -23,5 +23,5 @@ void ServoMotor::move(int angle)
     goPlus.Servo_write_angle(SERVO_NUM1, uint8_t(angle));
     goPlus.Servo_write_angle(SERVO_NUM2, uint8_t(angle));
     goPlus.Servo_write_angle(SERVO_NUM3, uint8_t(angle));
-    logger->print("Servo " + String(angle));
+    screen->print("Servo " + String(angle));
 }

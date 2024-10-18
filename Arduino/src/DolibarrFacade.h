@@ -5,18 +5,18 @@
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 #include <WiFi.h>
-#include "Logger.h"
+#include "Screen.h"
 #include "ErrorCode.h"
 
 class DolibarrFacade
 {
 public:
-    DolibarrFacade(Logger *logger, String dolapiurl, String dolapikey);
+    DolibarrFacade(Screen *screen, String dolapiurl, String dolapikey);
     ErrorCode addStockMovementByRef(String productRef, int qty);
     ErrorCode getProductDataByRef(String productRef, JsonDocument &doc);
 
 private:
-    Logger* logger;
+    Screen* screen;
     String dolapiurl;
     String dolapikey;
     HTTPClient *dolibarr(String endpoint);

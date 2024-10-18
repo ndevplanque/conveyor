@@ -4,16 +4,16 @@
 #include <M5Stack.h>
 #include <Arduino.h>
 #include "GoPlus2.h"
-#include "Logger.h"
+#include "Screen.h"
 
 class ServoMotor
 {
 public:
-    ServoMotor(Logger *logger);
+    ServoMotor(Screen *screen);
     void move(int angle = 0); // Faire bouger le servomoteur à un angle spécifique (0-180)
 
 private:
-    Logger *logger;
+    Screen *screen;
     GoPlus2 goPlus;
 };
 
