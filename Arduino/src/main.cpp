@@ -1,11 +1,13 @@
 #include <Arduino.h>
 #include <M5Stack.h>
-#include "DolibarrFacade.h"
 #include "Logger.h"
+#include "RFID.h"
 #include "StepperMotor.h"
 #include "ServoMotor.h"
+#include "DolibarrFacade.h"
 
 Logger *logger;
+RFID *rfid;
 StepperMotor *stepper;
 ServoMotor *servo;
 
@@ -24,6 +26,7 @@ void setup()
 
     logger = new Logger();
 
+    rfid = new RFID(logger);
     stepper = new StepperMotor(logger);
     servo = new ServoMotor(logger);
     dolibarr = new DolibarrFacade(logger, dolip + dolapipath, dolapikey);
@@ -39,16 +42,19 @@ void setup()
 
 void loop()
 {
+    rfid->readHex();
     stepper->move(15);
     servo->move(180);
 
     delay(5000);
 
+    rfid->readHex();
     stepper->move(0);
     servo->move(0);
 
     delay(5000);
 
+    rfid->readHex();
     ErrorCode error = dolibarr->addStockMovementByRef("VERT", 1);
     logger->print("addStockMovementByRef", error);
 
