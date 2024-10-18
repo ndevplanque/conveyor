@@ -10,8 +10,8 @@ Logger *logger;
 RFID *rfid;
 StepperMotor *stepper;
 ServoMotor *servo;
-
 DolibarrFacade *dolibarr;
+
 String dolip = "http://172.20.10.8:8080";
 String dolapipath = "/dolibarr/api/index.php";
 String dolapikey = "2PW5SR80mSsohf0cRXn1nR1TsmV0X44j";
@@ -25,7 +25,6 @@ void setup()
     M5.Power.begin();
 
     logger = new Logger();
-
     rfid = new RFID(logger);
     stepper = new StepperMotor(logger);
     servo = new ServoMotor(logger);
