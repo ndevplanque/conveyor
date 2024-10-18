@@ -41,21 +41,22 @@ void setup()
 
 void loop()
 {
-    rfid->readHex();
     stepper->move(15);
     servo->move(180);
 
     delay(5000);
 
-    rfid->readHex();
     stepper->move(0);
     servo->move(0);
 
     delay(5000);
 
-    rfid->readHex();
-    ErrorCode error = dolibarr->addStockMovementByRef("VERT", 1);
-    logger->print("addStockMovementByRef", error);
+    String ref = rfid->readProductRef();
+    if (ref != "")
+    {
+        ErrorCode error = dolibarr->addStockMovementByRef(ref, 1);
+        logger->print("addStockMovementByRef", error);
+    }
 
     delay(5000);
 }
