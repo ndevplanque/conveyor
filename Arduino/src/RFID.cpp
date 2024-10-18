@@ -46,5 +46,9 @@ String RFID::readProductRef()
 
     // TODO: implement this when you find a cube with rfid
 
-    return "VERT";
+    String ref = "VERT";
+
+    logger->print("RFID read " + ref);
+
+    return ref;
 }
