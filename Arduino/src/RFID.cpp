@@ -21,6 +21,10 @@ String RFID::readHex()
 
     for (int i = 0; i < mfrc522.uid.size; i++)
     {
+        if (i > 0)
+        {
+            hexStr += " ";
+        }
         if (mfrc522.uid.uidByte[i] < 0x10)
         {
             hexStr += "0";
@@ -29,6 +33,6 @@ String RFID::readHex()
     }
 
     logger->print("RFID read " + hexStr);
-    
+
     return hexStr;
 }
