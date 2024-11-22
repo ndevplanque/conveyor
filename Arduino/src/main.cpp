@@ -1,16 +1,18 @@
 #include <Arduino.h>
 #include <M5Stack.h>
-#include "Logger.h"
+#include "Screen.h"
 #include "RFID.h"
 #include "StepperMotor.h"
 #include "ServoMotor.h"
 #include "DolibarrFacade.h"
+#include "StateManager.h"
 
-Logger *logger;
+Screen *screen;
 RFID *rfid;
 StepperMotor *stepper;
 ServoMotor *servo;
 DolibarrFacade *dolibarr;
+StateManager *stateManager;
 
 String dolip = "http://172.20.10.8:8080";
 String dolapipath = "/dolibarr/api/index.php";
@@ -19,44 +21,66 @@ String dolapikey = "2PW5SR80mSsohf0cRXn1nR1TsmV0X44j";
 const char *ssid = "Delplanque";
 const char *password = "nicolebg67$$1234++";
 
+unsigned long lastActionTime = 0;
+unsigned long currentTime = 0;
+
 void setup()
 {
     M5.begin();
     M5.Power.begin();
 
-    logger = new Logger();
-    rfid = new RFID(logger);
-    stepper = new StepperMotor(logger);
-    servo = new ServoMotor(logger);
-    dolibarr = new DolibarrFacade(logger, dolip + dolapipath, dolapikey);
+    screen = new Screen();
+    rfid = new RFID(screen);
+    stepper = new StepperMotor(screen);
+    servo = new ServoMotor(screen);
+    stateManager = new StateManager(screen);
+    dolibarr = new DolibarrFacade(screen, dolip + dolapipath, dolapikey);
 
+    screen->print("Pour commencer, connectez un WiFi.");
     WiFi.begin(ssid, password);
     while (WiFi.status() != WL_CONNECTED)
     {
         delay(5000);
-        logger->print("Connexion au Wi-Fi...");
+        screen->print("Connexion au WiFi " + String(ssid) + "...");
     }
-    logger->print("Connecté au Wi-Fi !");
+    screen->print("Connecte au WiFi !");
+    screen->print("Utilisez les boutons pour choisir un mode.");
+}
+
+void processConveyor()
+{
+    ConveyorMode mode = stateManager->getConveyorMode();
+
+    if (mode == BACKWARD)
+    {
+        stepper->move(-1);
+    }
+    if (mode == FORWARD)
+    {
+        stepper->move(1);
+    }
+    if (mode == PRODUCTION)
+    {
+        stepper->move(1);
+
+        String ref = rfid->readProductRef();
+        
+        if (ref != "")
+        {
+            ErrorCode error = dolibarr->addStockMovementByRef(ref, 1);
+            screen->print("addStockMovementByRef", error);
+        }
+    }
 }
 
 void loop()
 {
-    stepper->move(15);
-    servo->move(180);
+    stateManager->readButtons();
 
-    delay(5000);
-
-    stepper->move(0);
-    servo->move(0);
-
-    delay(5000);
-
-    String ref = rfid->readProductRef();
-    if (ref != "")
+    currentTime = millis();
+    if (currentTime - lastActionTime >= 750)
     {
-        ErrorCode error = dolibarr->addStockMovementByRef(ref, 1);
-        logger->print("addStockMovementByRef", error);
+        lastActionTime = currentTime;
+        processConveyor();
     }
-
-    delay(5000);
 }

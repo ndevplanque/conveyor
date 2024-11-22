@@ -1,7 +1,7 @@
 #include "RFID.h"
 
-RFID::RFID(Logger *logger, byte chipAddress)
-    : logger(logger), mfrc522(chipAddress)
+RFID::RFID(Screen *screen, byte chipAddress)
+    : screen(screen), mfrc522(chipAddress)
 {
     M5.begin();
     M5.Power.begin();
@@ -13,43 +13,56 @@ String RFID::readHex()
 {
     if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial())
     {
-        logger->print("No RFID read");
-        return "";
+        return nothingWasRead();
     }
 
-    String hexStr = "";
+    String scanned = "";
 
     for (int i = 0; i < mfrc522.uid.size; i++)
     {
         if (i > 0)
         {
-            hexStr += " ";
+            scanned += " ";
         }
         if (mfrc522.uid.uidByte[i] < 0x10)
         {
-            hexStr += "0";
+            scanned += "0";
         }
-        hexStr += String(mfrc522.uid.uidByte[i], HEX);
+        scanned += String(mfrc522.uid.uidByte[i], HEX);
     }
 
-    logger->print("RFID read " + hexStr);
-
-    return hexStr;
+    return process(scanned);
 }
 
 String RFID::readProductRef()
 {
     if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial())
     {
-        logger->print("No RFID read");
-        return "";
+        return nothingWasRead();
     }
 
-    // TODO: implement this when you find a cube with rfid
+    // TODO: implement scan when you'll have a cube with rfid
 
-    String ref = "VERT";
+    String scanned = "VERT";
 
-    logger->print("RFID read " + ref);
+    return process(scanned);
+}
 
-    return ref;
+String RFID::nothingWasRead()
+{
+    screen->print("No RFID read");
+    lastRfidScan = "";
+    return "";
+}
+
+String RFID::process(String scanned)
+{
+    screen->print("RFID read " + scanned);
+    if (scanned != lastRfidScan)
+    {
+        lastRfidScan = scanned;
+        return scanned;
+    }
+    // screen->print("Skipping RFID because already read");
+    return "";
 }
