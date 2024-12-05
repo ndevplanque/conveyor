@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <M5Stack.h>
+#include "env.h"
 #include "Screen.h"
 #include "RFID.h"
 #include "StepperMotor.h"
@@ -14,13 +15,6 @@ ServoMotor *servo;
 DolibarrFacade *dolibarr;
 StateManager *stateManager;
 
-String dolip = "http://172.20.10.8:8080";
-String dolapipath = "/dolibarr/api/index.php";
-String dolapikey = "2PW5SR80mSsohf0cRXn1nR1TsmV0X44j";
-
-const char *ssid = "Delplanque";
-const char *password = "nicolebg67$$1234++";
-
 unsigned long lastActionTime = 0;
 unsigned long currentTime = 0;
 
@@ -34,14 +28,14 @@ void setup()
     stepper = new StepperMotor(screen);
     servo = new ServoMotor(screen);
     stateManager = new StateManager(screen);
-    dolibarr = new DolibarrFacade(screen, dolip + dolapipath, dolapikey);
+    dolibarr = new DolibarrFacade(screen, DOL_API_ROOT, DOL_API_PATH, DOL_API_KEY);
 
     screen->print("Pour commencer, connectez un WiFi.");
-    WiFi.begin(ssid, password);
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     while (WiFi.status() != WL_CONNECTED)
     {
         delay(5000);
-        screen->print("Connexion au WiFi " + String(ssid) + "...");
+        screen->print("Connexion au WiFi " + String(WIFI_SSID) + "...");
     }
     screen->print("Connecte au WiFi !");
     screen->print("Utilisez les boutons pour choisir un mode.");
