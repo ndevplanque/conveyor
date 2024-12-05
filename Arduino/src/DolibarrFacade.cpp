@@ -2,8 +2,8 @@
 
 // Constructeur de la classe DolibarrFacade
 // Initialise les membres avec les valeurs passées en paramètres.
-DolibarrFacade::DolibarrFacade(Screen *screen, String dolapiurl, String dolapikey)
-    : screen(screen), dolapiurl(dolapiurl), dolapikey(dolapikey)
+DolibarrFacade::DolibarrFacade(Screen *screen, const char * dolApiRoot, const char * dolApiPath, const char * dolApiKey)
+    : screen(screen), dolApiUrl(String(dolApiRoot) + String(dolApiPath)), dolApiKey(String(dolApiKey))
 {
 }
 
@@ -13,12 +13,12 @@ HTTPClient *DolibarrFacade::dolibarr(String endpoint)
 {
     HTTPClient *http = new HTTPClient(); // Crée un client HTTP.
 
-    String url = this->dolapiurl + endpoint; // Construit l'URL complète avec le endpoint.
+    String url = this->dolApiUrl + endpoint; // Construit l'URL complète avec le endpoint.
     http->begin(url); // Initialise la connexion à l'URL.
 
     http->setTimeout(30000); // Définit un timeout de 30 secondes.
     http->addHeader("Content-Type", "application/json"); // Ajoute l'en-tête Content-Type.
-    http->addHeader("DOLAPIKEY", this->dolapikey); // Ajoute l'en-tête contenant la clé API.
+    http->addHeader("DOLAPIKEY", this->dolApiKey); // Ajoute l'en-tête contenant la clé API.
 
     return http; // Retourne le client HTTP configuré.
 }
