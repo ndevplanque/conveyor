@@ -1,4 +1,4 @@
-#include <ErrorCode.h>
+#include "ConveyorMode.h"
 
 // Tableau statique constant de chaînes correspondant aux valeurs de l'enum ConveyorMode
 const char *translatedConveyorModes[] = {

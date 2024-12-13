@@ -4,7 +4,7 @@
 #include <M5Stack.h>
 #include <Arduino.h>
 #include "GoPlus2.h"
-#include "Screen.h"
+#include "../IHM/Screen.h"
 
 class ServoMotor
 {

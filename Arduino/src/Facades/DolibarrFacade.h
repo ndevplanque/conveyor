@@ -5,8 +5,8 @@
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 #include <WiFi.h>
-#include "Screen.h"
-#include "ErrorCode.h"
+#include "../IHM/Screen.h"
+#include "../Errors/ErrorCode.h"
 
 class DolibarrFacade
 {

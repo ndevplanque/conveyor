@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <M5Stack.h>
 #include <Module_GRBL_13.2.h>
-#include "Screen.h"
+#include "../IHM/Screen.h"
 
 class StepperMotor
 {
