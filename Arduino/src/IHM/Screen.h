@@ -3,8 +3,8 @@
 
 #include <Arduino.h>
 #include <M5Stack.h>
-#include "ErrorCode.h"
 #include "ConveyorMode.h"
+#include "../Errors/ErrorCode.h"
 
 class Screen
 {

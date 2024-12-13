@@ -1,12 +1,12 @@
 #include <Arduino.h>
 #include <M5Stack.h>
 #include "env.h"
-#include "Screen.h"
-#include "RFID.h"
-#include "StepperMotor.h"
-#include "ServoMotor.h"
-#include "DolibarrFacade.h"
-#include "StateManager.h"
+#include "IHM/Screen.h"
+#include "IHM/StateManager.h"
+#include "Peripherals/RFID.h"
+#include "Peripherals/StepperMotor.h"
+#include "Peripherals/ServoMotor.h"
+#include "Facades/DolibarrFacade.h"
 
 Screen *screen;
 RFID *rfid;
