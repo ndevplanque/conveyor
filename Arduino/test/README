@@ -1,7 +1,7 @@
 # Unit tests
 
-To run unit tests locally on your machine, run
+To run unit tests, use this command
 
 ```sh
-pio test --environment native
+pio test
 ```
