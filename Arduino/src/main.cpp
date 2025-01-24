@@ -15,7 +15,10 @@ StepperMotor *stepper;
 ServoMotor *servo;
 DolibarrFacade *dolibarr;
 StateManager *stateManager;
+ConveyorMode mode;
 ErrorCode error;
+String rfidScan;
+String ref;
 
 // Dev config
 const bool debugMode = false;
@@ -24,15 +27,11 @@ const bool debugMode = false;
 const int angleA = 25;
 const int angleB = 40;
 const int angleC = 55;
-const int angleTrash = 0;
-
-// Stepper config
-const int leap = 300;
-const int speed = 800;
+const int angleTrash = 70;
 
 int getAngleForWarehouse(int warehouseId)
 {
-    switch (key)
+    switch (warehouseId)
     {
     case 1:
         return angleA;
@@ -45,25 +44,13 @@ int getAngleForWarehouse(int warehouseId)
     }
 }
 
-void checkWiFi()
+// Stepper config
+const int leap = 1;
+const int speed = 1000;
+unsigned long stepperActivationDelay = 135;
+
+void processStepper()
 {
-    if (WiFi.status() == WL_CONNECTED)
-    {
-        return;
-    }
-    screen->print("Le mode production a besoin d'etre connecte au WiFi.");
-    screen->print("Connexion au WiFi " + String(WIFI_SSID) + "...");
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-    delay(5000);
-    screen->print(WiFi.status() == WL_CONNECTED ? "Connecte au WiFi !" : "Echec de la tentative de connexion.");
-}
-
-void processConveyor()
-{
-    stepper->waitIdle();
-
-    ConveyorMode mode = stateManager->getConveyorMode();
-
     if (mode == BACKWARD)
     {
         stepper->move(-leap, speed);
@@ -71,35 +58,67 @@ void processConveyor()
     if (mode == PRODUCTION)
     {
         stepper->move(leap, speed);
-
-        String ref = rfid->readProductRef();
-
-        if (ref != "")
-        {
-            checkWiFi();
-
-            JsonDocument productData; // Document JSON pour stocker les données du produit.
-            error = dolibarr->getProductDataByRef(ref, productData);
-            screen->print("getProductDataByRef", error);
-            if (error != SUCCESS)
-            {
-                return;
-            }
-
-            int productId = productData[0]["id"];
-            int warehouseId = productData[0]["fk_default_warehouse"];
-            screen->print("Produit " + String(productId) + ", entrepot " + String(warehouseId));
-
-            servo->move(getAngleForWarehouse(warehouseId));
-
-            error = dolibarr->addStockMovement(productId, warehouseId, 1);
-            screen->print("addStockMovement", error);
-        }
     }
     if (mode == FORWARD)
     {
         stepper->move(leap, speed);
     }
+}
+
+void tryBeginWiFi()
+{
+    screen->print("Connexion au WiFi " + String(WIFI_SSID) + "...");
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+}
+
+void checkWiFi()
+{
+    if (WiFi.status() == WL_CONNECTED)
+    {
+        return;
+    }
+    screen->print("Le mode production a besoin d'etre connecte au WiFi.");
+    tryBeginWiFi();
+    delay(5000);
+    screen->print(WiFi.status() == WL_CONNECTED ? "Connecte au WiFi !" : "Echec de la tentative de connexion.");
+}
+
+void processProduction()
+{
+    ref = dolibarr->translateToRef(rfid->readHex());
+
+    if (ref == "")
+    {
+        return;
+    }
+
+    if (!dolibarr->isValidProductRef(ref))
+    {
+        screen->print("ERROR: invalid ref " + ref);
+        servo->move(getAngleForWarehouse(-1));
+        return;
+    }
+
+    screen->print("OK: valid ref " + ref);
+
+    checkWiFi();
+
+    JsonDocument productData; // Document JSON pour stocker les données du produit.
+    error = dolibarr->getProductDataByRef(ref, productData);
+    screen->print("getProductDataByRef", error);
+    if (error != SUCCESS)
+    {
+        return;
+    }
+
+    int productId = productData[0]["id"];
+    int warehouseId = productData[0]["fk_default_warehouse"];
+    screen->print("Produit " + String(productId) + ", entrepot " + String(warehouseId));
+
+    servo->move(getAngleForWarehouse(warehouseId));
+
+    error = dolibarr->addStockMovement(productId, warehouseId, 1);
+    screen->print("addStockMovement", error);
 }
 
 void setup()
@@ -114,23 +133,36 @@ void setup()
     stateManager = new StateManager(screen);
     dolibarr = new DolibarrFacade(screen, DOL_API_ROOT, DOL_API_PATH, DOL_API_KEY);
 
-    checkWiFi();
+    tryBeginWiFi();
 
     screen->print("Utilisez les boutons pour choisir un mode.");
 }
 
 // Loop vars
-unsigned long lastActionTime = 0;
 unsigned long currentTime = 0;
+unsigned long lastActionTime = 0;
+unsigned long lastStepperTime = 0;
 
 void loop()
 {
-    stateManager->readButtons();
+    mode = stateManager->readButtons();
 
     currentTime = millis();
-    if (currentTime - lastActionTime >= 750)
+
+    if (currentTime - lastStepperTime >= stepperActivationDelay)
+    {
+        lastStepperTime = currentTime;
+
+        processStepper();
+    }
+
+    if (currentTime - lastActionTime >= 400)
     {
         lastActionTime = currentTime;
-        processConveyor();
+
+        if (mode == PRODUCTION)
+        {
+            processProduction();
+        }
     }
 }

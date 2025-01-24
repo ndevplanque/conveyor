@@ -96,3 +96,31 @@ ErrorCode DolibarrFacade::getProductDataByRef(String productRef, JsonDocument &d
 
     return SUCCESS; // Retourne SUCCESS si tout s'est bien passé.
 }
+
+String DolibarrFacade::translateToRef(String rfidScan)
+{
+    if (rfidScan == "fd e3 d6 df")
+    {
+        return "VERT";
+    }
+    if (rfidScan == "bd e4 d6 df")
+    {
+        return "JAUNE";
+    }
+    if (rfidScan == "3d e4 d6 df")
+    {
+        return "BLEU";
+    }
+    if (rfidScan == "8d dd d6 df")
+    {
+        return "ROUGE";
+    }
+    return rfidScan;
+}
+
+bool DolibarrFacade::isValidProductRef(String ref)
+{
+    return ref == "VERT" ||
+           ref == "BLEU" ||
+           ref == "JAUNE";
+}

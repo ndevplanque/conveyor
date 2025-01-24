@@ -10,7 +10,6 @@ class RFID
 public:
     RFID(Screen *screen, byte chipAddress = 0x28);
     String readHex();
-    String readProductRef();
 
 private:
     Screen *screen;

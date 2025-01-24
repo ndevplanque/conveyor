@@ -14,6 +14,8 @@ public:
     DolibarrFacade(Screen *screen, const char *dolApiRoot, const char *dolApiPath, const char *dolApiKey);
     ErrorCode getProductDataByRef(String productRef, JsonDocument &doc);
     ErrorCode addStockMovement(int productId, int warehouseId, int qty);
+    String translateToRef(String rfidScan);
+    bool isValidProductRef(String ref);
 
 private:
     Screen *screen;

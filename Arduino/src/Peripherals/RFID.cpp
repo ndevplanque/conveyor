@@ -34,20 +34,6 @@ String RFID::readHex()
     return process(scanned);
 }
 
-String RFID::readProductRef()
-{
-    if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial())
-    {
-        return nothingWasRead();
-    }
-
-    // TODO: implement scan when you'll have a cube with rfid
-
-    String scanned = "VERT";
-
-    return process(scanned);
-}
-
 String RFID::nothingWasRead()
 {
     screen->debug("No RFID read");
@@ -57,12 +43,11 @@ String RFID::nothingWasRead()
 
 String RFID::process(String scanned)
 {
-    screen->print("RFID read " + scanned);
+    screen->debug("RFID read " + scanned);
     if (scanned != lastRfidScan)
     {
         lastRfidScan = scanned;
         return scanned;
     }
-    // screen->print("Skipping RFID because already read");
     return "";
 }

@@ -12,7 +12,7 @@ public:
     StateManager(Screen *screen);
     ConveyorMode getConveyorMode();
     void setConveyorMode(ConveyorMode);
-    void readButtons();
+    ConveyorMode readButtons();
 
 private:
     Screen *screen;

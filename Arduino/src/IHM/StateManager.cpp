@@ -19,7 +19,7 @@ void StateManager::setConveyorMode(ConveyorMode mode)
     screen->print("Activation du mode " + translateConveyorMode(conveyorMode));
 }
 
-void StateManager::readButtons()
+ConveyorMode StateManager::readButtons()
 {
     M5.BtnA.read();
     if (M5.BtnA.wasPressed())
@@ -38,4 +38,6 @@ void StateManager::readButtons()
     {
         setConveyorMode(conveyorMode == FORWARD ? IDLE : FORWARD);
     }
+
+    return conveyorMode;
 }
