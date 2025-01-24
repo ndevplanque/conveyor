@@ -1,11 +1,11 @@
 #include "Screen.h"
 
-Screen::Screen()
+Screen::Screen(const bool debugMode) : debugMode(debugMode)
 {
     M5.begin();
     M5.Lcd.clear(); // Efface l'écran au démarrage
 
-    print("Demarrage...");
+    print(debugMode ? "Demarrage en mode debug..." : "Demarrage...");
 }
 
 String Screen::getUptime()
@@ -55,6 +55,22 @@ void Screen::print(String message)
 void Screen::print(String message, ErrorCode error)
 {
     this->print(translateErrorCode(error) + " " + message);
+}
+
+void Screen::debug(String message)
+{
+    if (this->debugMode)
+    {
+        this->print(message);
+    }
+}
+
+void Screen::debug(String message, ErrorCode error)
+{
+    if (this->debugMode)
+    {
+        this->print(message, error);
+    }
 }
 
 void Screen::clear()

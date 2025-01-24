@@ -18,14 +18,13 @@ void StepperMotor::move(int angle, int speed)
         speed = 1000;
     }
     _grbl.setMotor(angle, angle, angle, speed);
-    screen->print("Stepper " + String(angle) + "|" + String(speed));
+    screen->debug("Stepper " + String(angle) + "|" + String(speed));
 }
 
 // Wait for the motor to stop
 void StepperMotor::waitIdle()
 {
     _grbl.waitIdle();
-    // screen->print("Stepper stopped.");
 }
 
 // Wait for the motor to stop

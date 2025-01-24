@@ -50,7 +50,7 @@ String RFID::readProductRef()
 
 String RFID::nothingWasRead()
 {
-    screen->print("No RFID read");
+    screen->debug("No RFID read");
     lastRfidScan = "";
     return "";
 }

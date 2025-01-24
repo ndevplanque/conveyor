@@ -23,5 +23,5 @@ void ServoMotor::move(int angle)
     goPlus.Servo_write_angle(SERVO_NUM1, uint8_t(angle));
     goPlus.Servo_write_angle(SERVO_NUM2, uint8_t(angle));
     goPlus.Servo_write_angle(SERVO_NUM3, uint8_t(angle));
-    screen->print("Servo " + String(angle));
+    screen->debug("Servo " + String(angle));
 }
