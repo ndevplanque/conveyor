@@ -8,6 +8,7 @@
 #include "Peripherals/ServoMotor.h"
 #include "Facades/DolibarrFacade.h"
 
+// M5Stack parts
 Screen *screen;
 RFID *rfid;
 StepperMotor *stepper;
@@ -16,18 +17,18 @@ DolibarrFacade *dolibarr;
 StateManager *stateManager;
 ErrorCode error;
 
+// Dev config
 const bool debugMode = false;
 
+// Servo config
 const int angleA = 25;
 const int angleB = 40;
 const int angleC = 55;
 const int angleTrash = 0;
 
+// Stepper config
 const int leap = 300;
 const int speed = 800;
-
-unsigned long lastActionTime = 0;
-unsigned long currentTime = 0;
 
 int getAngleForWarehouse(int warehouseId)
 {
@@ -117,6 +118,10 @@ void setup()
 
     screen->print("Utilisez les boutons pour choisir un mode.");
 }
+
+// Loop vars
+unsigned long lastActionTime = 0;
+unsigned long currentTime = 0;
 
 void loop()
 {
