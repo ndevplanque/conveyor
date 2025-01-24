@@ -65,6 +65,7 @@ void processStepper()
     }
 }
 
+// TODO: improve WiFi logic
 void tryBeginWiFi()
 {
     screen->print("Connexion au WiFi " + String(WIFI_SSID) + "...");
