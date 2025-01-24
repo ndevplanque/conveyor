@@ -9,14 +9,17 @@
 class Screen
 {
 public:
-    Screen();
-
+    Screen(const bool debugMode);
+    
     void print(String message);
     void print(String message, ErrorCode error);
+    void debug(String message);
+    void debug(String message, ErrorCode error);
     void clear();
     void drawButtons(ConveyorMode mode);
 
 private:
+    const bool debugMode;
     String getUptime();
     static const int MAX_LINES = 20; // Maximum de lignes à afficher à l'écran
     String lines[MAX_LINES];         // Tableau pour stocker les lignes de texte
