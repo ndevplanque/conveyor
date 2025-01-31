@@ -9,11 +9,14 @@
 class ServoMotor
 {
 public:
-    ServoMotor(Screen *screen);
+    ServoMotor();
     void move(int angle = 0); // Faire bouger le servomoteur à un angle spécifique (0-180)
+    void goToWarehouse(int warehouseId);
 
 private:
-    Screen *screen;
+    int angleA = 25;
+    int angleB = 40;
+    int angleC = 55;
     GoPlus2 goPlus;
 };
 
