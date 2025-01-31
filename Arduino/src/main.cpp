@@ -8,6 +8,13 @@
 #include "Peripherals/ServoMotor.h"
 #include "Facades/DolibarrFacade.h"
 
+// Dev config
+const bool debugMode = false;
+
+// Stepper config
+const int stepperMovement = 1;
+const int stepperSpeed = 1000;
+
 // M5Stack parts
 Screen *screen;
 RFID *rfid;
@@ -15,111 +22,17 @@ StepperMotor *stepper;
 ServoMotor *servo;
 DolibarrFacade *dolibarr;
 StateManager *stateManager;
+
+// Vars
 ConveyorMode mode;
 ErrorCode error;
-String rfidScan;
-String ref;
+String msg;
+char warehouse;
 
-// Dev config
-const bool debugMode = false;
-
-// Servo config
-const int angleA = 25;
-const int angleB = 40;
-const int angleC = 55;
-const int angleTrash = 70;
-
-int getAngleForWarehouse(int warehouseId)
-{
-    switch (warehouseId)
-    {
-    case 1:
-        return angleA;
-    case 2:
-        return angleB;
-    case 3:
-        return angleC;
-    default:
-        return angleTrash;
-    }
-}
-
-// Stepper config
-const int leap = 1;
-const int speed = 1000;
-unsigned long stepperActivationDelay = 135;
-
-void processStepper()
-{
-    if (mode == BACKWARD)
-    {
-        stepper->move(-leap, speed);
-    }
-    if (mode == PRODUCTION)
-    {
-        stepper->move(leap, speed);
-    }
-    if (mode == FORWARD)
-    {
-        stepper->move(leap, speed);
-    }
-}
-
-// TODO: improve WiFi logic
-void tryBeginWiFi()
+void beginWiFi()
 {
     screen->print("Connexion au WiFi " + String(WIFI_SSID) + "...");
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-}
-
-void checkWiFi()
-{
-    if (WiFi.status() == WL_CONNECTED)
-    {
-        return;
-    }
-    screen->print("Le mode production a besoin d'etre connecte au WiFi.");
-    tryBeginWiFi();
-    delay(5000);
-    screen->print(WiFi.status() == WL_CONNECTED ? "Connecte au WiFi !" : "Echec de la tentative de connexion.");
-}
-
-void processProduction()
-{
-    ref = dolibarr->translateToRef(rfid->readHex());
-
-    if (ref == "")
-    {
-        return;
-    }
-
-    if (!dolibarr->isValidProductRef(ref))
-    {
-        screen->print("ERROR: invalid ref " + ref);
-        servo->move(getAngleForWarehouse(-1));
-        return;
-    }
-
-    screen->print("OK: valid ref " + ref);
-
-    checkWiFi();
-
-    JsonDocument productData; // Document JSON pour stocker les données du produit.
-    error = dolibarr->getProductDataByRef(ref, productData);
-    screen->print("getProductDataByRef", error);
-    if (error != SUCCESS)
-    {
-        return;
-    }
-
-    int productId = productData[0]["id"];
-    int warehouseId = productData[0]["fk_default_warehouse"];
-    screen->print("Produit " + String(productId) + ", entrepot " + String(warehouseId));
-
-    servo->move(getAngleForWarehouse(warehouseId));
-
-    error = dolibarr->addStockMovement(productId, warehouseId, 1);
-    screen->print("addStockMovement", error);
+    screen->print(WiFi.begin(WIFI_SSID, WIFI_PASSWORD) == WL_CONNECTED ? "Connecte au WiFi !" : "Echec de la tentative de connexion.");
 }
 
 void setup()
@@ -128,21 +41,27 @@ void setup()
     M5.Power.begin();
 
     screen = new Screen(debugMode);
-    rfid = new RFID(screen);
-    stepper = new StepperMotor(screen);
-    servo = new ServoMotor(screen);
+    rfid = new RFID();
+    stepper = new StepperMotor(stepperMovement, stepperSpeed);
+    servo = new ServoMotor();
     stateManager = new StateManager(screen);
     dolibarr = new DolibarrFacade(screen, DOL_API_ROOT, DOL_API_PATH, DOL_API_KEY);
 
-    tryBeginWiFi();
+    beginWiFi();
 
     screen->print("Utilisez les boutons pour choisir un mode.");
 }
 
-// Loop vars
 unsigned long currentTime = 0;
+
 unsigned long lastActionTime = 0;
+unsigned long actionDelay = 400;
+
 unsigned long lastStepperTime = 0;
+unsigned long stepperDelay = 135;
+
+unsigned long lastWifiTry = 0;
+unsigned long wifiTryDelay = 5000;
 
 void loop()
 {
@@ -150,20 +69,78 @@ void loop()
 
     currentTime = millis();
 
-    if (currentTime - lastStepperTime >= stepperActivationDelay)
+    // Manage smooth stepper movement
+    if (currentTime - lastStepperTime >= stepperDelay)
     {
         lastStepperTime = currentTime;
 
-        processStepper();
+        if (mode == BACKWARD)
+        {
+            stepper->move(false);
+        }
+        if (mode == PRODUCTION)
+        {
+            stepper->move(true);
+        }
+        if (mode == FORWARD)
+        {
+            stepper->move(true);
+        }
     }
 
-    if (currentTime - lastActionTime >= 400)
+    // Permanently make sure that WiFi is connected when using Production mode
+    if (mode == PRODUCTION &&
+        WiFi.status() != WL_CONNECTED &&
+        currentTime - lastWifiTry >= wifiTryDelay)
+    {
+        lastWifiTry = currentTime;
+
+        screen->print("Le mode production a besoin d'etre connecte au WiFi.");
+        beginWiFi();
+    }
+
+    // Handle production mode
+    if (currentTime - lastActionTime >= actionDelay)
     {
         lastActionTime = currentTime;
 
-        if (mode == PRODUCTION)
+        if (WiFi.status() != WL_CONNECTED)
         {
-            processProduction();
+            return;
         }
+
+        error = rfid->readData(warehouse);
+        msg = error == SUCCESS ? "Read " : "Scan failed ";
+
+        if (error != RFID_READING_NOTHING)
+        {
+            screen->print(msg + String(warehouse), error);
+        }
+        else
+        {
+            screen->debug("", error);
+        }
+
+        if (error != SUCCESS)
+        {
+            return;
+        }
+
+        if (!dolibarr->isValidWarehouse(warehouse))
+        {
+            screen->print("ERROR: Invalid target warehouse " + String(warehouse));
+        }
+
+        int id = dolibarr->findIdByWarehouse(warehouse);
+        screen->print("Produit " + String(id) + ", entrepot " + String(id));
+
+        error = dolibarr->addStockMovement(id, id, 1);
+        if (error != SUCCESS)
+        {
+            screen->print("Failed to update stock", error);
+            stateManager->setConveyorMode(IDLE);
+        }
+
+        servo->goToWarehouse(id);
     }
 }
