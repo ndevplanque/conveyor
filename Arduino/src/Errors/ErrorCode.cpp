@@ -5,4 +5,8 @@ const char *translatedErrorCodes[] = {
     "SUCCESS",
     "WIFI_NOT_CONNECTED",
     "HTTP_REQUEST_FAILED",
-    "JSON_PARSING_FAILED"};
+    "JSON_PARSING_FAILED",
+    "RFID_AUTHENTICATION_FAILED",
+    "RFID_READING_FAILED",
+    "RFID_READING_NOTHING"
+    };
