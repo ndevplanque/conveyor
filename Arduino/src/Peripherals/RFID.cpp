@@ -18,7 +18,7 @@ RFID::RFID(byte chipAddress) : mfrc522(chipAddress)
 ErrorCode RFID::readData(char &result)
 {
     result = ' ';
-    
+
     if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial())
     {
         return ErrorCode::RFID_READING_NOTHING;
