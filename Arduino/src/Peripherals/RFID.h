@@ -10,7 +10,7 @@ class RFID
 {
 public:
     RFID(byte chipAddress = 0x28);
-    ErrorCode readData(char &warehouse);
+    ErrorCode readData(char &result);
 
 private:
     MFRC522 mfrc522;

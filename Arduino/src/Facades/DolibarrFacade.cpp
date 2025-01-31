@@ -16,7 +16,7 @@ HTTPClient *DolibarrFacade::dolibarr(String endpoint)
     String url = this->dolApiUrl + endpoint; // Construit l'URL complète avec le endpoint.
     http->begin(url);                        // Initialise la connexion à l'URL.
 
-    http->setTimeout(30000);                             // Définit un timeout de 30 secondes.
+    http->setTimeout(5000);                             // Définit un timeout de 5 secondes.
     http->addHeader("Content-Type", "application/json"); // Ajoute l'en-tête Content-Type.
     http->addHeader("DOLAPIKEY", this->dolApiKey);       // Ajoute l'en-tête contenant la clé API.
 
@@ -76,4 +76,24 @@ bool DolibarrFacade::isValidWarehouse(char warehouse)
     return warehouse == 'A' ||
            warehouse == 'B' ||
            warehouse == 'C';
+}
+
+bool DolibarrFacade::isOnline()
+{
+    if (WiFi.status() != WL_CONNECTED)
+    {
+        return false;
+    }
+
+    screen->print("Connecting to Dolibarr...");
+
+    String endpoint = "/products?properties=id,ref,label,fk_default_warehouse,stock_reel";
+    HTTPClient *http = dolibarr(endpoint);
+
+    int httpCode = http->GET(); // Envoie une requête GET au serveur.
+
+    http->end();
+    delete http;
+
+    return httpCode == 200;
 }

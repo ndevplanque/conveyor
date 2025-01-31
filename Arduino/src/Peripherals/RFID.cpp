@@ -15,9 +15,9 @@ RFID::RFID(byte chipAddress) : mfrc522(chipAddress)
     }
 }
 
-ErrorCode RFID::readData(char &warehouse)
+ErrorCode RFID::readData(char &result)
 {
-    warehouse = ' ';
+    result = ' ';
     
     if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial())
     {
@@ -42,7 +42,7 @@ ErrorCode RFID::readData(char &warehouse)
     mfrc522.PICC_HaltA();
     mfrc522.PCD_StopCrypto1();
 
-    warehouse = (char)buffer[0];
+    result = (char)buffer[0];
 
     return ErrorCode::SUCCESS;
 }

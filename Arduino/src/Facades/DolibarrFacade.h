@@ -15,7 +15,8 @@ public:
     ErrorCode addStockMovement(int productId, int warehouseId, int qty);
     int findIdByWarehouse(char warehouse);
     bool isValidWarehouse(char warehouse);
-
+    bool isOnline();
+    
 private:
     Screen *screen;
     String dolApiUrl;

@@ -5,7 +5,7 @@ Screen::Screen(const bool debugMode) : debugMode(debugMode)
     M5.begin();
     M5.Lcd.clear(); // Efface l'écran au démarrage
 
-    print(debugMode ? "Demarrage en mode debug..." : "Demarrage...");
+    print(debugMode ? "Starting in debug mode..." : "Starting...");
 }
 
 String Screen::getUptime()
