@@ -8,7 +8,8 @@ enum ConveyorMode
     PRODUCTION = 0,
     FORWARD,
     BACKWARD,
-    IDLE
+    IDLE,
+    BACKWARD_UNTIL_SCAN
 };
 
 // Tableau statique constant de chaînes correspondant aux valeurs de l'enum ConveyorMode
