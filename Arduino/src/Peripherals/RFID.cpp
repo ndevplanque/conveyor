@@ -1,53 +1,48 @@
 #include "RFID.h"
 
-RFID::RFID(Screen *screen, byte chipAddress)
-    : screen(screen), mfrc522(chipAddress)
+RFID::RFID(byte chipAddress) : mfrc522(chipAddress)
 {
     M5.begin();
     M5.Power.begin();
     Wire.begin();
     mfrc522.PCD_Init();
+
+    // Clé A par défaut (FF FF FF FF FF FF)
+    byte defaultKey[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+    for (byte i = 0; i < 6; i++)
+    {
+        key.keyByte[i] = defaultKey[i];
+    }
 }
 
-String RFID::readHex()
+ErrorCode RFID::readData(char &warehouse)
 {
+    warehouse = ' ';
+    
     if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial())
     {
-        return nothingWasRead();
+        return ErrorCode::RFID_READING_NOTHING;
     }
 
-    String scanned = "";
+    MFRC522::StatusCode status;
+    byte buffer[18];
+    byte size = sizeof(buffer);
+    byte block = 4;
 
-    for (int i = 0; i < mfrc522.uid.size; i++)
+    if (mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, block, &key, &(mfrc522.uid)) != MFRC522::STATUS_OK)
     {
-        if (i > 0)
-        {
-            scanned += " ";
-        }
-        if (mfrc522.uid.uidByte[i] < 0x10)
-        {
-            scanned += "0";
-        }
-        scanned += String(mfrc522.uid.uidByte[i], HEX);
+        return ErrorCode::RFID_AUTHENTICATION_FAILED;
     }
 
-    return process(scanned);
-}
-
-String RFID::nothingWasRead()
-{
-    screen->debug("No RFID read");
-    lastRfidScan = "";
-    return "";
-}
-
-String RFID::process(String scanned)
-{
-    screen->debug("RFID read " + scanned);
-    if (scanned != lastRfidScan)
+    if (mfrc522.MIFARE_Read(block, buffer, &size) != MFRC522::STATUS_OK)
     {
-        lastRfidScan = scanned;
-        return scanned;
+        return ErrorCode::RFID_READING_FAILED;
     }
-    return "";
+
+    mfrc522.PICC_HaltA();
+    mfrc522.PCD_StopCrypto1();
+
+    warehouse = (char)buffer[0];
+
+    return ErrorCode::SUCCESS;
 }

@@ -4,19 +4,17 @@
 #include <M5Stack.h>
 #include "MFRC522_I2C.h"
 #include "../IHM/Screen.h"
+#include "../Errors/ErrorCode.h"
 
 class RFID
 {
 public:
-    RFID(Screen *screen, byte chipAddress = 0x28);
-    String readHex();
+    RFID(byte chipAddress = 0x28);
+    ErrorCode readData(char &warehouse);
 
 private:
-    Screen *screen;
     MFRC522 mfrc522;
-    String lastRfidScan = "";
-    String nothingWasRead();
-    String process(String scanned);
+    MFRC522::MIFARE_Key key;
 };
 
 #endif
