@@ -54,7 +54,8 @@ void Screen::print(String message)
 
 void Screen::print(String message, ErrorCode error)
 {
-    this->print(translateErrorCode(error) + " " + message);
+    String prefix = error == SUCCESS ? "" : "ERROR: ";
+    this->print(prefix + translateErrorCode(error) + " " + message);
 }
 
 void Screen::debug(String message)
@@ -73,29 +74,50 @@ void Screen::debug(String message, ErrorCode error)
     }
 }
 
-void Screen::clear()
+void Screen::error(String message)
 {
-    M5.Lcd.clear();
+    this->print("ERROR: " + message);
+}
+
+void Screen::error(String message, ErrorCode error)
+{
+    this->print(message, error);
 }
 
 // Méthode pour redessiner l'écran avec les lignes de texte actuelles
 void Screen::redraw()
 {
     M5.Lcd.fillRect(0, 0, 320, 200, TFT_BLACK);
-    M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
     M5.Lcd.setTextSize(1);
 
     // Afficher chaque ligne
     for (int i = 0; i < currentLine; i++)
     {
         M5.Lcd.setCursor(0, i * 10);
-        M5.Lcd.println(lines[i]);
+        if (lines[i].length() >= 11 && lines[i].substring(6, 11).equalsIgnoreCase("ERROR"))
+        {
+            M5.Lcd.setTextColor(TFT_RED, TFT_BLACK);
+            M5.Lcd.println(lines[i]);
+        }
+        else if (lines[i].length() >= 13 &&
+                 (lines[i].substring(6, 13).equalsIgnoreCase("SUCCESS") ||
+                  lines[i].substring(6, 9).equalsIgnoreCase("200")))
+        {
+            M5.Lcd.setTextColor(TFT_DARKGREEN, TFT_BLACK);
+            M5.Lcd.println(lines[i]);
+        }
+        else
+        {
+            M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
+            M5.Lcd.println(lines[i]);
+        }
     }
 }
 
 void Screen::drawButtons(ConveyorMode mode)
 {
     M5.Lcd.fillRect(0, 200, 320, 40, TFT_BLACK);
+    M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
     M5.Lcd.setTextSize(2);
     M5.Lcd.setCursor(0, 200);
     M5.Lcd.print("--------------------------");

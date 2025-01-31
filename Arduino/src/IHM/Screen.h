@@ -10,12 +10,12 @@ class Screen
 {
 public:
     Screen(const bool debugMode);
-    
     void print(String message);
     void print(String message, ErrorCode error);
     void debug(String message);
     void debug(String message, ErrorCode error);
-    void clear();
+    void error(String message);
+    void error(String message, ErrorCode error);
     void drawButtons(ConveyorMode mode);
 
 private:

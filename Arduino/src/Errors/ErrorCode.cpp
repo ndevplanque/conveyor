@@ -8,5 +8,5 @@ const char *translatedErrorCodes[] = {
     "JSON_PARSING_FAILED",
     "RFID_AUTHENTICATION_FAILED",
     "RFID_READING_FAILED",
-    "RFID_READING_NOTHING"
+    "RFID_READING_NOTHING",
     };

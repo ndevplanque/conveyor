@@ -16,7 +16,7 @@ HTTPClient *DolibarrFacade::dolibarr(String endpoint)
     String url = this->dolApiUrl + endpoint; // Construit l'URL complète avec le endpoint.
     http->begin(url);                        // Initialise la connexion à l'URL.
 
-    http->setTimeout(5000);                             // Définit un timeout de 5 secondes.
+    http->setTimeout(5000);                              // Définit un timeout de 5 secondes.
     http->addHeader("Content-Type", "application/json"); // Ajoute l'en-tête Content-Type.
     http->addHeader("DOLAPIKEY", this->dolApiKey);       // Ajoute l'en-tête contenant la clé API.
 
@@ -40,7 +40,7 @@ ErrorCode DolibarrFacade::addStockMovement(int productId, int warehouseId, int q
     int httpCode = http->POST(payload); // Envoie une requête POST avec le payload.
 
     // Affiche le statut de la requête.
-    screen->print(String(httpCode) + " POST " + endpoint);
+    screen->debug(String(httpCode) + " POST " + endpoint);
 
     http->end(); // Termine la connexion HTTP.
     delete http; // Libère la mémoire allouée pour le client HTTP.

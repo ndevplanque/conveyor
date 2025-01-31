@@ -5,6 +5,6 @@ const char *translatedConveyorModes[] = {
     "PRODUCTION",
     "FORWARD",
     "BACKWARD",
-    "IDLE",
     "BACKWARD_UNTIL_SCAN",
+    "IDLE",
 };

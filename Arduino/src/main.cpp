@@ -31,13 +31,22 @@ char rfidResult;
 bool isWiFiOk = false;
 bool isDolibarrOk = false;
 
+struct ServoOrder
+{
+    int stepperActivationCount;
+    int warehouse;
+};
+
 unsigned long currentTime = 0;
 
 unsigned long lastActionTime = 0;
-unsigned long actionDelay = 200;
+unsigned long actionDelay = 100;
 
 unsigned long lastStepperTime = 0;
 unsigned long stepperDelay = 135;
+int stepperActivations = 0;
+ServoOrder servoOrdersAsync[4] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}};
+int nextOrderKey = 0;
 
 unsigned long lastWifiTry = 0;
 unsigned long wifiTryDelay = 3000;
@@ -69,10 +78,19 @@ void loop()
 
     currentTime = millis();
 
-    // Manage smooth stepper movement
+    // Manage smooth async stepper and servo movement
     if (currentTime - lastStepperTime >= stepperDelay)
     {
         lastStepperTime = currentTime;
+        stepperActivations++;
+
+        for (int i = 0; i < 4; i++)
+        {
+            if (stepperActivations == servoOrdersAsync[i].stepperActivationCount)
+            {
+                servo->goToWarehouse(servoOrdersAsync[i].warehouse);
+            }
+        }
 
         if (mode == BACKWARD || mode == BACKWARD_UNTIL_SCAN)
         {
@@ -91,7 +109,7 @@ void loop()
 
         if (WiFi.status() != WL_CONNECTED && isWiFiOk)
         {
-            screen->print("Connection lost !");
+            screen->error("Connection lost !");
             isWiFiOk = false;
             isDolibarrOk = false;
         }
@@ -122,25 +140,26 @@ void loop()
         lastActionTime = currentTime;
 
         error = rfid->readData(rfidResult);
-        msg = error == SUCCESS ? "Read " : "Scan failed ";
 
         if (error == RFID_READING_NOTHING)
         {
             return;
         }
 
-        screen->print(msg + String(rfidResult), error);
+        msg = error == SUCCESS ? "Read " : "Scan failed ";
+
+        screen->debug(msg + String(rfidResult), error);
 
         if (error != SUCCESS)
         {
-            screen->print("ERROR: Unknown product, human intervention required");
+            screen->error("Unknown product, human intervention required");
             stateManager->setConveyorMode(IDLE);
             return;
         }
 
         if (!dolibarr->isValidWarehouse(rfidResult))
         {
-            screen->print("ERROR: Invalid target warehouse " + String(rfidResult));
+            screen->error("Invalid target warehouse " + String(rfidResult));
             stateManager->setConveyorMode(BACKWARD_UNTIL_SCAN);
             return;
         }
@@ -151,12 +170,13 @@ void loop()
         error = dolibarr->addStockMovement(id, id, 1);
         if (error != SUCCESS)
         {
-            screen->print("Failed to update stock", error);
+            screen->error("Failed to update stock", error);
             stateManager->setConveyorMode(BACKWARD_UNTIL_SCAN);
             return;
         }
 
-        servo->goToWarehouse(id);
+        nextOrderKey = nextOrderKey == 3 ? 0 : nextOrderKey + 1;
+        servoOrdersAsync[nextOrderKey] = {stepperActivations + 20, id};
     }
 
     // Handle backward until scan mode
@@ -168,6 +188,8 @@ void loop()
         {
             return;
         }
+
+        screen->error("Stopping conveyor, human intervention required");
 
         stateManager->setConveyorMode(IDLE);
     }
