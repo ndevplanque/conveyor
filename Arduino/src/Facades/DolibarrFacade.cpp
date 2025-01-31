@@ -31,14 +31,13 @@ ErrorCode DolibarrFacade::addStockMovement(int productId, int warehouseId, int q
     {
         return WIFI_NOT_CONNECTED; // Retourne une erreur si le WiFi est déconnecté.
     }
-
     // Construit le endpoint pour les mouvements de stock.
     String endpoint = "/stockmovements";
+    HTTPClient *http = dolibarr(endpoint); // Prépare le client HTTP.
+
     // Construit le corps de la requête JSON.
     String payload = "{\"product_id\":" + String(productId) + ",\"warehouse_id\":" + String(warehouseId) + ",\"qty\":" + String(qty) + "}";
-
-    HTTPClient *http = dolibarr(endpoint); // Prépare le client HTTP.
-    int httpCode = http->POST(payload);    // Envoie une requête POST avec le payload.
+    int httpCode = http->POST(payload); // Envoie une requête POST avec le payload.
 
     // Affiche le statut de la requête.
     screen->print(String(httpCode) + " POST " + endpoint);
@@ -55,72 +54,26 @@ ErrorCode DolibarrFacade::addStockMovement(int productId, int warehouseId, int q
     return SUCCESS; // Retourne SUCCESS si tout s'est bien passé.
 }
 
-// Méthode pour récupérer les données d'un produit par sa référence
-ErrorCode DolibarrFacade::getProductDataByRef(String productRef, JsonDocument &doc)
+int DolibarrFacade::findIdByWarehouse(char warehouse)
 {
-    // Vérifie si le WiFi est connecté.
-    if (WiFi.status() != WL_CONNECTED)
+    if (warehouse == 'A')
     {
-        return WIFI_NOT_CONNECTED; // Retourne une erreur si le WiFi est déconnecté.
+        return 1;
     }
-
-    // Construit le endpoint pour récupérer les données du produit.
-    String endpoint = "/products?sqlfilters=t.ref:=:'" + productRef + "'&properties=id,fk_default_warehouse";
-
-    HTTPClient *http = dolibarr(endpoint); // Prépare le client HTTP.
-    int httpCode = http->GET();            // Envoie une requête GET au serveur.
-
-    // Affiche le statut de la requête.
-    screen->print(String(httpCode) + " GET " + endpoint);
-
-    // Vérifie si le code de statut HTTP indique une erreur.
-    if (httpCode < 200 || httpCode >= 300)
+    if (warehouse == 'B')
     {
-        http->end();                // Termine la connexion HTTP.
-        delete http;                // Libère la mémoire allouée pour le client HTTP.
-        return HTTP_REQUEST_FAILED; // Retourne une erreur si la requête a échoué.
+        return 2;
     }
-
-    String payload = http->getString(); // Récupère la réponse JSON sous forme de chaîne.
-    http->end();                        // Termine la connexion HTTP.
-    delete http;                        // Libère la mémoire allouée pour le client HTTP.
-
-    // Désérialise la chaîne JSON dans le document JSON.
-    DeserializationError error = deserializeJson(doc, payload);
-
-    // Vérifie si la désérialisation a échoué.
-    if (error)
+    if (warehouse == 'C')
     {
-        return JSON_PARSING_FAILED; // Retourne une erreur si le parsing a échoué.
+        return 3;
     }
-
-    return SUCCESS; // Retourne SUCCESS si tout s'est bien passé.
+    return 0;
 }
 
-String DolibarrFacade::translateToRef(String rfidScan)
+bool DolibarrFacade::isValidWarehouse(char warehouse)
 {
-    if (rfidScan == "fd e3 d6 df")
-    {
-        return "VERT";
-    }
-    if (rfidScan == "bd e4 d6 df")
-    {
-        return "JAUNE";
-    }
-    if (rfidScan == "3d e4 d6 df")
-    {
-        return "BLEU";
-    }
-    if (rfidScan == "8d dd d6 df")
-    {
-        return "ROUGE";
-    }
-    return rfidScan;
-}
-
-bool DolibarrFacade::isValidProductRef(String ref)
-{
-    return ref == "VERT" ||
-           ref == "BLEU" ||
-           ref == "JAUNE";
+    return warehouse == 'A' ||
+           warehouse == 'B' ||
+           warehouse == 'C';
 }

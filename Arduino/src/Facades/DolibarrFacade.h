@@ -12,10 +12,9 @@ class DolibarrFacade
 {
 public:
     DolibarrFacade(Screen *screen, const char *dolApiRoot, const char *dolApiPath, const char *dolApiKey);
-    ErrorCode getProductDataByRef(String productRef, JsonDocument &doc);
     ErrorCode addStockMovement(int productId, int warehouseId, int qty);
-    String translateToRef(String rfidScan);
-    bool isValidProductRef(String ref);
+    int findIdByWarehouse(char warehouse);
+    bool isValidWarehouse(char warehouse);
 
 private:
     Screen *screen;
